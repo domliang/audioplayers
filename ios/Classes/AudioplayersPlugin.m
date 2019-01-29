@@ -97,9 +97,9 @@ FlutterMethodChannel *_channel_audioplayer;
                     if (!call.arguments[@"position"]) {
                       result(0);
                     } else {
-                      double seconds = [call.arguments[@"position"] doubleValue];
-                      NSLog(@"Seeking to: %f seconds", seconds);
-                      [self seek:playerId time:CMTimeMakeWithSeconds(seconds,1)];
+                      double milliseconds = [call.arguments[@"position"] doubleValue];
+                      NSLog(@"Seeking to: %f milliseconds", milliseconds);
+                      [self seek:playerId time:CMTimeMakeWithSeconds(milliseconds / 1000,NSEC_PER_SEC)];
                     }
                   },
                 @"setUrl":
@@ -326,7 +326,7 @@ FlutterMethodChannel *_channel_audioplayer;
   }
 
   [ self pause:playerId ];
-  [ self seek:playerId time:CMTimeMakeWithSeconds(0,1) ];
+  [ self seek:playerId time:CMTimeMakeWithSeconds(0,USEC_PER_SEC) ];
 
   if ([ playerInfo[@"looping"] boolValue]) {
     [ self resume:playerId ];
