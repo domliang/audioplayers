@@ -156,7 +156,7 @@ class AudioPlayer {
 
   /// Move the cursor to the desired position.
   Future<int> seek(Duration position) {
-    return _invokeMethod('seek', {'position': position.inMilliseconds});
+    return _invokeMethod('seek', {'position': position.inMilliseconds.toDouble()});
   }
 
   /// Sets the volume (ampliutde). 0.0 is mute and 1.0 is max, the rest is linear interpolation.

@@ -82,7 +82,7 @@ public class AudioplayersPlugin implements MethodCallHandler {
                 break;
             }
             case "seek": {
-                final Double position = call.argument("position");
+                final double position = call.argument("position");
                 player.seek(position);
                 break;
             }
