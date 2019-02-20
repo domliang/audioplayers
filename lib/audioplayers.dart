@@ -215,9 +215,9 @@ class AudioPlayer {
     }
   }
 
-  Future<int> setPlayerInfo({String title, String artist}) {
+  Future<int> setPlayingInfo({String title, String artist, String album, double maxValue, double currentValue}) {
     return _invokeMethod(
-        'setPlayerInfo', {'title': title, 'artist': artist});
+        'setPlayingInfo', {'title': title, 'artist': artist, 'album': album, 'maxValue': maxValue, 'currentValue': currentValue});
   }
 
   static Future<void> platformCallHandler(MethodCall call) async {
@@ -253,17 +253,17 @@ class AudioPlayer {
           remoteControlPlay();
         }
         break;
-      case 'audio.UIEventSubtypeRemoteControlPause':
+      case 'audio.onRemoteControlPause':
         if (remoteControlPause != null) {
           remoteControlPause();
         }
         break;
-      case 'audio.UIEventSubtypeRemoteControlNextTrack':
+      case 'audio.onRemoteControlNextTrack':
         if (remoteControlNextTrack != null) {
           remoteControlNextTrack();
         }
         break;
-      case 'audio.UIEventSubtypeRemoteControlPreviousTrack':
+      case 'audio.onRemoteControlPreviousTrack':
         if (remoteControlPreviousTrack != null) {
           remoteControlPreviousTrack();
         }

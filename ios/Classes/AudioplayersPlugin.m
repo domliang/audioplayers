@@ -2,6 +2,8 @@
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MPNowPlayingInfoCenter.h>
+#import <MediaPlayer/MPMediaItem.h>
 
 static NSString *const CHANNEL_NAME = @"xyz.luan/audioplayers";
 
@@ -152,7 +154,15 @@ FlutterMethodChannel *_channel_audioplayer;
                         NSLog(@"setPlayingInfo");
                         NSString *title = call.arguments[@"title"];
                         NSString *artist = call.arguments[@"artist"];
-                        [self setPlayingInfo:title artist:artist];
+                        NSString *album = call.arguments[@"album"];
+                        double maxValue = [call.arguments[@"maxValue"] doubleValue];
+                        double currentValue = [call.arguments[@"currentValue"] doubleValue];
+                        [self setPlayingInfo:title
+                                    artist:artist
+                                    album:album
+                                    maxValue:maxValue
+                                    currentValue:currentValue
+                         ];
                       },
                 };
 
@@ -271,10 +281,7 @@ FlutterMethodChannel *_channel_audioplayer;
            [ player play];
            [ player setRate:rate ];
            [ playerInfo setObject:@true forKey:@"isPlaying" ];
-
-            //后台播放显示信息设置
-            [self setPlayingInfo:@"title"
-                    artist:@"artist"];
+         }
   ];
 }
 
@@ -424,16 +431,16 @@ FlutterMethodChannel *_channel_audioplayer;
     if (event.type == UIEventTypeRemoteControl) {  //判断是否为远程控制
         switch (event.subtype) {
             case UIEventSubtypeRemoteControlPlay:
-                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPlay"];
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPlay" arguments:(0)];
                 break;
             case UIEventSubtypeRemoteControlPause:
-                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPause"];
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPause" arguments:(0)];
                 break;
             case UIEventSubtypeRemoteControlNextTrack:
-                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlNextTrack"];
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlNextTrack" arguments:(0)];
                 break;
             case UIEventSubtypeRemoteControlPreviousTrack:
-                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPreviousTrack"];
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPreviousTrack" arguments:(0)];
                 break;
             default:
                 break;
@@ -442,15 +449,36 @@ FlutterMethodChannel *_channel_audioplayer;
 }
 
 - (void)setPlayingInfo: (NSString *)title
-                        artist:(NSString *)artist {
+                        artist:(NSString *)artist
+                        album:(NSString *)album
+                        maxValue:(double)maxValue
+                        currentValue:(double)currentValue
+{
 //    <MediaPlayer/MediaPlayer.h>
 //    MPMediaItemArtwork *artWork = [[MPMediaItemArtwork alloc] initWithImage:[UIImage imageNamed:@"pushu.jpg"]];
 
-    NSDictionary *dic = @{MPMediaItemPropertyTitle:title,
-                          MPMediaItemPropertyArtist:artist
-                          //MPMediaItemPropertyArtwork:artWork
-                          };
-    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dic];
+    NSString *ItemPropertyTitle ;
+    NSString *ItemPropertyArtist;
+    ItemPropertyTitle = title;
+    ItemPropertyArtist = artist;
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    //标题
+    info[MPMediaItemPropertyTitle] = ItemPropertyTitle;
+    //作者
+    info[MPMediaItemPropertyArtist] = ItemPropertyArtist;
+    //专辑
+    info[MPMediaItemPropertyAlbumArtist] = album;
+
+    //设置歌曲时长
+    [info setObject:[NSNumber numberWithDouble:maxValue] forKey:MPMediaItemPropertyPlaybackDuration];
+    //设置已经播放时长
+    [info setObject:[NSNumber numberWithDouble:currentValue] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = info;
+}
+
+// 成为响应者方法
+- (BOOL)canBecomeFirstResponder {
+    return YES;
 }
 
 @end
