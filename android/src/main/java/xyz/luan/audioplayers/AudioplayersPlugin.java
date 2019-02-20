@@ -107,6 +107,10 @@ public class AudioplayersPlugin implements MethodCallHandler {
                 player.setReleaseMode(releaseMode);
                 break;
             }
+            case "setPlayerInfo": {
+                // do nothing
+                break;
+            }
             default: {
                 response.notImplemented();
                 return;

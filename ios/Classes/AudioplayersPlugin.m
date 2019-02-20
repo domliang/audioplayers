@@ -147,6 +147,13 @@ FlutterMethodChannel *_channel_audioplayer;
                           result(@(2));
                         }
                     },
+                     @"setPlayingInfo":
+                      ^{
+                        NSLog(@"setPlayingInfo");
+                        NSString *title = call.arguments[@"title"];
+                        NSString *artist = call.arguments[@"artist"];
+                        [self setPlayingInfo:title artist:artist];
+                      },
                 };
 
   [ self initPlayerInfo:playerId ];
@@ -264,7 +271,10 @@ FlutterMethodChannel *_channel_audioplayer;
            [ player play];
            [ player setRate:rate ];
            [ playerInfo setObject:@true forKey:@"isPlaying" ];
-         }    
+
+            //后台播放显示信息设置
+            [self setPlayingInfo:@"title"
+                    artist:@"artist"];
   ];
 }
 
@@ -410,6 +420,38 @@ FlutterMethodChannel *_channel_audioplayer;
   players = nil;
 }
 
+- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
+    if (event.type == UIEventTypeRemoteControl) {  //判断是否为远程控制
+        switch (event.subtype) {
+            case UIEventSubtypeRemoteControlPlay:
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPlay"];
+                break;
+            case UIEventSubtypeRemoteControlPause:
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPause"];
+                break;
+            case UIEventSubtypeRemoteControlNextTrack:
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlNextTrack"];
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [ _channel_audioplayer invokeMethod:@"audio.onRemoteControlPreviousTrack"];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)setPlayingInfo: (NSString *)title
+                        artist:(NSString *)artist {
+//    <MediaPlayer/MediaPlayer.h>
+//    MPMediaItemArtwork *artWork = [[MPMediaItemArtwork alloc] initWithImage:[UIImage imageNamed:@"pushu.jpg"]];
+
+    NSDictionary *dic = @{MPMediaItemPropertyTitle:title,
+                          MPMediaItemPropertyArtist:artist
+                          //MPMediaItemPropertyArtwork:artWork
+                          };
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dic];
+}
 
 @end
 

@@ -55,6 +55,8 @@ class AudioPlayer {
   /// This enables more verbose logging, if desired.
   static bool logEnabled = false;
 
+  static AudioPlayer _currentPlayer;
+
   AudioPlayerState _audioPlayerState = null;
 
   AudioPlayerState get state => _audioPlayerState;
@@ -87,6 +89,11 @@ class AudioPlayer {
   /// It's used to route messages via the single channel properly.
   String playerId;
 
+  static VoidCallback remoteControlPlay;
+  static VoidCallback remoteControlPause;
+  static VoidCallback remoteControlPreviousTrack;
+  static VoidCallback remoteControlNextTrack;
+
   /// Creates a new instance and assigns it with a new random unique id.
   AudioPlayer() {
     playerId = _uuid.v4();
@@ -111,6 +118,7 @@ class AudioPlayer {
 
     if (result == 1) {
       state = AudioPlayerState.PLAYING;
+      _currentPlayer = this;
     }
 
     return result;
@@ -207,6 +215,11 @@ class AudioPlayer {
     }
   }
 
+  Future<int> setPlayerInfo({String title, String artist}) {
+    return _invokeMethod(
+        'setPlayerInfo', {'title': title, 'artist': artist});
+  }
+
   static Future<void> platformCallHandler(MethodCall call) async {
     _log('_platformCallHandler call ${call.method} ${call.arguments}');
     String playerId = (call.arguments as Map)['playerId'];
@@ -233,6 +246,26 @@ class AudioPlayer {
         player.state = AudioPlayerState.STOPPED;
         if (player.errorHandler != null) {
           player.errorHandler(value);
+        }
+        break;
+      case 'audio.onRemoteControlPlay':
+        if (remoteControlPlay != null) {
+          remoteControlPlay();
+        }
+        break;
+      case 'audio.UIEventSubtypeRemoteControlPause':
+        if (remoteControlPause != null) {
+          remoteControlPause();
+        }
+        break;
+      case 'audio.UIEventSubtypeRemoteControlNextTrack':
+        if (remoteControlNextTrack != null) {
+          remoteControlNextTrack();
+        }
+        break;
+      case 'audio.UIEventSubtypeRemoteControlPreviousTrack':
+        if (remoteControlPreviousTrack != null) {
+          remoteControlPreviousTrack();
         }
         break;
       default:
