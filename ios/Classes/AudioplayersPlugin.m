@@ -66,12 +66,12 @@ FlutterMethodChannel *_channel_audioplayer;
                       result(0);
                     int isLocal = [call.arguments[@"isLocal"]intValue] ;
                     float volume = (float)[call.arguments[@"volume"] doubleValue] ;
-                    double seconds = call.arguments[@"position"] == [NSNull null] ? 0.0 : [call.arguments[@"position"] doubleValue] ;
+                    double milliseconds = call.arguments[@"position"] == [NSNull null] ? 0.0 : [call.arguments[@"position"] doubleValue] ;
                     float rate = (float)[call.arguments[@"rate"] doubleValue] ;
-                    CMTime time = CMTimeMakeWithSeconds(seconds,1);
+                    CMTime time = CMTimeMakeWithSeconds(milliseconds / 1000,NSEC_PER_SEC);
                     NSLog(@"isLocal: %d %@",isLocal, call.arguments[@"isLocal"] );
                     NSLog(@"volume: %f %@",volume, call.arguments[@"volume"] );
-                    NSLog(@"position: %f %@", seconds, call.arguments[@"positions"] );
+                    NSLog(@"position: %f %@", milliseconds, call.arguments[@"positions"] );
                     NSLog(@"rate: %f %@", rate, call.arguments[@"rate"] );
                     [self play:playerId url:url isLocal:isLocal volume:volume time:time rate:rate];
                   },

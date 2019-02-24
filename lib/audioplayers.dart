@@ -105,9 +105,9 @@ class AudioPlayer {
   /// Play audio. Url can be a remote url (isLocal = false) or a local file system path (isLocal = true).
   Future<int> play(String url,
       {bool isLocal: false, double volume: 1.0, Duration position: Duration.zero, double rate: 1.0}) async {
-      final double positionInSeconds = position == null ? null : position.inSeconds.toDouble();
+      final double positioninMilliseconds = position == null ? null : position.inMilliseconds.toDouble();
     int result = await _invokeMethod(
-        'play', {'url': url, 'isLocal': isLocal, 'volume': volume, 'position': positionInSeconds, 'rate': rate});
+        'play', {'url': url, 'isLocal': isLocal, 'volume': volume, 'position': positioninMilliseconds, 'rate': rate});
 
     if (result == 1) {
       state = AudioPlayerState.PLAYING;
